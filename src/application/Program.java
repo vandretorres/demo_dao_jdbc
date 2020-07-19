@@ -2,6 +2,7 @@ package application;
 
 import java.util.List;
 
+import db.DB;
 import model.dao.DaoFactory;
 import model.dao.SellerDao;
 import model.entities.Seller;
@@ -13,15 +14,12 @@ public class Program {
 	
 		SellerDao sellerDao = DaoFactory.createSellerDao();
 		
-		List<Seller> list = sellerDao.findAll();
 		
-		for (Seller obj : list) {
-			
-			System.out.println(obj);
-			
-		}
-				
+		System.out.println("=== TEST 1 :: Seller findById ======");
+		Seller list = sellerDao.findById(2);		
+		System.out.println(list);
 		
+		DB.closeConnection();	
 		
 	}
 

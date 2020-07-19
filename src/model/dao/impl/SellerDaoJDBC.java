@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import db.DB;
 import db.DbException;
 import model.dao.SellerDao;
 import model.entities.Department;
@@ -61,18 +62,9 @@ public class SellerDaoJDBC implements SellerDao{
 
 			if ( rs.next()) {
 
-				Department dep = new Department();
-				dep.setId(rs.getInt("DepartmentId"));
-				dep.setName(rs.getString("DepName"));
-
-				Seller seller = new Seller();
-				seller.setId(rs.getInt("Id"));
-				seller.setName(rs.getString("Name"));
-				seller.setEmail(rs.getString("Email"));
-				seller.setBaseSalary(rs.getDouble("BaseSalary"));
-				seller.setBirthDate(rs.getDate("BirthDate"));
-				seller.setDepartment(dep);
-				
+				// Instanciação dos objetos foram relegados a métodos staticos
+				Department dep = instanciateDepartment(rs);
+				Seller seller = instancieateSeller(rs, dep);
 				return seller;
 
 			}
@@ -80,20 +72,26 @@ public class SellerDaoJDBC implements SellerDao{
 
 		}catch (SQLException e) {
 			throw new DbException(e.getMessage());
+		}finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);			
+
 		}
 
 	}
 
+	
+
 	@Override
 	public List<Seller> findAll() {
-		
+
 		Statement st = null;
 		ResultSet rs = null;
-		
+
 		try {
 
 			st = conn.createStatement();
-			
+
 			rs = st.executeQuery(
 					"SELECT seller.*,department.Name as DepName "
 							+ "FROM seller INNER JOIN department "
@@ -101,37 +99,61 @@ public class SellerDaoJDBC implements SellerDao{
 							+ "order by Id"										
 					);
 
-			
-			List<Seller> list = new ArrayList<Seller>();
-			
-			while(rs.next()) {
-				
-				Department dep = new Department();
-				dep.setId(rs.getInt("DepartmentId"));
-				dep.setName(rs.getString("DepName"));
 
-				Seller seller = new Seller();
-				seller.setId(rs.getInt("Id"));
-				seller.setName(rs.getString("Name"));
-				seller.setEmail(rs.getString("Email"));
-				seller.setBaseSalary(rs.getDouble("BaseSalary"));
-				seller.setBirthDate(rs.getDate("BirthDate"));
-				seller.setDepartment(dep);
-				
+			List<Seller> list = new ArrayList<Seller>();
+
+			while(rs.next()) {
+
+				// Instanciação dos objetos foram relegados a métodos staticos
+				Department dep = instanciateDepartment(rs);
+				Seller seller = instancieateSeller(rs, dep);
 				list.add(seller);				
-				
 			}
-			
+
 			if ( list.size() > 0)
 			{
 				return list;
 			}else {
 				return null;
 			}
-			
+
 		}catch (SQLException e) {
 			throw new DbException(e.getMessage());
+		}finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);			
+
 		}
+	}
+
+
+	
+	// Metodo resonsável por instanciar o objeto Seller com base no retorno da query
+	// chamada do método é tratada por SQLException
+	private Seller instancieateSeller(ResultSet rs, Department dep) throws SQLException {
+
+		Seller seller = new Seller();
+		seller.setId(rs.getInt("Id"));
+		seller.setName(rs.getString("Name"));
+		seller.setEmail(rs.getString("Email"));
+		seller.setBaseSalary(rs.getDouble("BaseSalary"));
+		seller.setBirthDate(rs.getDate("BirthDate"));
+		seller.setDepartment(dep);
+		
+		return seller;
+		
+	}
+	
+	
+	// Metodo resonsável por instanciar o objeto Department com base no retorno da query
+	// chamada do método é tratada por SQLException
+	private static Department instanciateDepartment(ResultSet rs) throws SQLException {
+
+		Department dep = new Department();		
+			dep.setId(rs.getInt("DepartmentId"));
+			dep.setName(rs.getString("DepName"));	
+			
+		return dep;
 	}
 
 
