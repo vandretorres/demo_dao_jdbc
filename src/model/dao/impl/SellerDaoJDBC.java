@@ -104,13 +104,32 @@ public class SellerDaoJDBC implements SellerDao{
 
 			List<Seller> list = new ArrayList<Seller>();
 
-			while(rs.next()) {
-
-				// Instanciação dos objetos foram relegados a métodos staticos
-				Department dep = instanciateDepartment(rs);
-				Seller seller = instancieateSeller(rs, dep);
-				list.add(seller);				
-			}
+			// Um departamento pode conter vários funcionários
+						// Para evitar que o mesmo departamento seja instanciado N Vezes
+						// foi incluido o Map para fazer uma validação se o departamento já exite na memória ou não.
+						Map<Integer,Department> map = new HashMap<>();
+						
+						while(rs.next()) {
+							
+							
+							// alimenta objeto dep com resultado do departamento retornado no ResultSet
+							Department dep = map.get(rs.getInt("DepartmentId"));
+							
+							// valida se departamento já existe na memoria.
+							// se nao existir é chamando metodo de instanciacao do objeto department
+							if ( dep == null) {
+								
+								dep = instanciateDepartment(rs);
+								
+								// adiciona objeto department no Map
+								map.put(rs.getInt("DepartmentId"), dep);
+								
+							}
+							
+							// Instanciação dos objetos foram relegados a métodos staticos			
+							Seller seller = instancieateSeller(rs, dep);
+							list.add(seller);				
+						}
 
 			if ( list.size() > 0)
 			{

@@ -31,6 +31,16 @@ public class Program {
 			System.out.println(obj);
 		}
 		
+		System.out.println();
+		System.out.println("=== TEST 3 :: Seller findByAll ======");
+		department = new Department(1,null);
+		List<Seller> list2 = sellerDao.findAll();
+		
+		for (Seller obj : list2) {
+			
+			System.out.println(obj);
+		}
+		
 				
 		DB.closeConnection();	
 		
