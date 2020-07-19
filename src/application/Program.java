@@ -44,11 +44,17 @@ public class Program {
 		
 		
 		System.out.println();
-		System.out.println("=== TEST 4 :: Seller Create New Seller ======");
+		System.out.println("=== TEST 4 ::  Insert new Seller ======");
 		Seller newSeller = new Seller(null, "Vandre", "vandre@gmail.com", new Date(), 4000.00, department);
 		//sellerDao.insert(newSeller);
 		System.out.println(newSeller);
 		
+		
+		System.out.println();
+		System.out.println("=== TEST 4 :: Seller Seller Update ======");
+		seller = sellerDao.findById(1);
+		seller.setName("Marta Waine");
+		sellerDao.upate(seller);
 		
 				
 		DB.closeConnection();	
